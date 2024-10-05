@@ -1,0 +1,208 @@
+services:
+  postgres-authentication-service:
+    container_name: postgres-authentication-service
+    hostname: postgres-authentication-service
+    image: postgres:alpine3.17
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: authentication-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      PGDATA: /data/postgres
+    volumes:
+      - data-authentication-service:/data/postgres
+
+  authentication-service:
+    container_name: authentication-service
+    hostname: authentication-service
+    image: twitterclone0/twitter-authentication-service:2.0.1
+    pull_policy: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-authentication-service:5432/authentication-service
+    depends_on:
+      - postgres-authentication-service
+      - api-gateway
+
+  mongo:
+    container_name: mongo
+    hostname: mongo
+    image: mongo:jammy
+    restart: unless-stopped
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    volumes:
+      - mongo:/data/db
+
+  profile-service:
+    container_name: profile-service
+    hostname: profile-service
+    image: twitterclone0/twitter-profile-service:2.0.5
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - mongo
+      - api-gateway
+      - redis
+
+  postgres-tweet-service:
+    container_name: postgres-tweet-service
+    hostname: postgres-tweet-service
+    image: postgres:alpine3.17
+    restart: unless-stopped
+    ports:
+      - 5431:5432
+    environment:
+      POSTGRES_DB: tweet-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      PGDATA: /data/postgres
+    volumes:
+      - data-tweet-service:/data/postgres
+
+  tweet-service:
+    container_name: tweet-service
+    hostname: tweet-service
+    image: twitterclone0/twitter-tweet-service:2.0.4
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-tweet-service:5432/tweet-service
+    depends_on:
+      - postgres-tweet-service
+      - api-gateway
+      - redis
+      - kafka
+
+  api-gateway:
+    container_name: api-gateway
+    hostname: api-gateway
+    image: twitterclone0/twitter-api-gateway:2.0.1
+    restart: unless-stopped
+    pull_policy: always
+    ports:
+      - 8080:8080
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - discovery-server
+
+  discovery-server:
+    container_name: discovery-server
+    image: twitterclone0/twitter-discovery-server:2.0.1
+    hostname: discovery-server
+    restart: unless-stopped
+    pull_policy: always
+    ports:
+      - 8761:8761
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - config-server
+      - zipkin
+
+  config-server:
+    container_name: config-server
+    hostname: config-server
+    image: twitterclone0/twitter-spring-cloud-config-server:2.0.1
+    restart: unless-stopped
+    pull_policy: always
+    ports:
+      - 8888:8888
+
+  storage-service:
+    container_name: storage-service
+    hostname: storage-service
+    image: twitterclone0/twitter-storage-service:2.0.1
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - config-server
+      - discovery-server
+
+  timeline-service:
+    container_name: timeline-service
+    hostname: timeline-service
+    image: twitterclone0/twitter-timeline-service:2.0.3
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - api-gateway
+      - redis
+
+  fanout-service:
+    container_name: fanout-service
+    hostname: fanout-service
+    image: twitterclone0/twitter-fanout-service:2.0.3
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - api-gateway
+      - kafka
+      - redis
+
+  redis:
+    container_name: redis
+    image: redis:7.2-rc-alpine3.18
+    hostname: redis
+    restart: unless-stopped
+    pull_policy: always
+    ports:
+      - 6379:6379
+
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    hostname: zipkin
+    restart: unless-stopped
+    pull_policy: always
+    ports:
+      - 9411:9411
+
+  zookeeper:
+    container_name: zookeeper
+    image: confluentinc/cp-zookeeper:7.3.2
+    hostname: zookeeper
+    ports:
+      - 2181:2181
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    container_name: kafka
+    image: confluentinc/cp-kafka:7.3.2
+    hostname: kafka
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    depends_on:
+        - zookeeper
+
+volumes:
+  data-authentication-service: { }
+  mongo: { }
+  data-tweet-service: { }

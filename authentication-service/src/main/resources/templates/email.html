@@ -1,0 +1,74 @@
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.cdnfonts.com/css/sf-compact-display" rel="stylesheet">
+  <title>Confirme seu endereço de email</title>
+  <style>
+    body {
+      line-height: 1.5em;
+      height: 100vh;
+      background: #F5F8FA;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'SF Compact Display', sans-serif;
+      margin: 0;
+    }
+    .container {
+      background: #ffffff;
+      max-width: 450px;
+      width: 100%;
+      padding: 25px;
+      border-radius: 5px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .logo {
+      margin-left: auto;
+      width: 32px;
+      height: 32px;
+    }
+    h2 {
+      text-align: center;
+      font-size: 30px;
+    }
+    p {
+      font-weight: 300;
+      font-size: 18px;
+    }
+    .code {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .footer {
+      color: #8B9DAB;
+      text-align: center;
+    }
+    a {
+      color: #8B9DAB;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img width="40" height="32" src="https://www.edigitalagency.com.au/wp-content/uploads/Twitter-logo-png.png" alt="Logo do Twitter">
+    </div>
+    <h2>Olá, <br><br>${name}!<br><br>Confirme seu endereço de email</h2>
+    <p>Há um passo rápido que você precisa completar antes de criar sua conta no Twitter. Vamos garantir que este é o endereço de email correto para você—por favor, confirme que este é o endereço a ser utilizado para sua nova conta.</p>
+    <p>Por favor, insira este código de verificação para começar no Twitter:</p>
+    <p class="code">${code}</p>
+    <p>Os códigos de verificação expiram após duas horas.</p>
+    <p>Obrigado,<br>Twitter</p>
+    <div class="footer">
+      <a href="#">Ajuda</a> | <a href="#">Dicas de Segurança por Email</a>
+    </div>
+    <div class="footer">
+      <span>Twitter Clone, <a href="https://github.com/fork-code-camp">GitHub</a></span>
+    </div>
+  </div>
+</body>
+</html>
