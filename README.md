@@ -88,5 +88,6 @@ Como Contribuir:
 ## 📞 Contato
 Caso tenha dúvidas ou sugestões, entre em contato:
 
-Email: ikauedeveloper@gmail.com 
+Email: ikauedeveloper@gmail.com
+<br>
 LinkedIn: https://www.linkedin.com/in/ikauematos/
