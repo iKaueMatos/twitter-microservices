@@ -1,131 +1,92 @@
-# Twitter
+## 🐦 Twitter Clone
+Um clone do Twitter - Uma aplicação de rede social que permite aos usuários se conectarem e compartilharem seus pensamentos e experiências de maneira fácil e intuitiva! 🚀 Com uma arquitetura robusta e tecnologias modernas, este projeto oferece uma experiência de usuário rápida, segura e escalável.
 
-> Twitter is a social media application that allows users to connect and share their thoughts and experiences with
-> others. With a robust system design and a reliable technology stack, Twitter provides a seamless and secure user
-> experience.
+* 📜 Índice
+* 🚀 Visão Geral
+* 🛠️ Tecnologias Utilizadas
+* 🖼️ Diagrama de Arquitetura
+* 🔧 Ferramentas Adicionais
+* 💼 Serviços Principais
+* 🔑 Serviço de Autenticação
+* 💾 Serviço de Armazenamento
+* 👤 Serviço de Perfil
+* 💬 Serviço de Tweets
+* ⏳ Serviço de Timeline
+* 💡 Serviços Auxiliares
+* 📊 Cobertura de Testes
+* 💻 Como Rodar Localmente
+* 🎯 Contribuições
+* 📞 Contato
+* 🚀 Visão Geral
 
-## Content
+Este projeto é um clone do Twitter, desenvolvido com uma arquitetura de microsserviços utilizando o framework Spring. Ele segue uma abordagem modular, garantindo escalabilidade, facilidade de manutenção e um desempenho robusto, mesmo em situações de grande tráfego.
 
-* [Overview](#overview)
-* [Architecture Diagram](#architecture-diagram)
-* [Technology stack](#technology-stack)
-* [Additional tools](#additional-tools)
-* [Tests coverage](#tests-coverage)
-* [Local deployment](#how-to-run-application-locally)
+## 🛠️ Tecnologias Utilizadas
+* Java 17 ☕️
+* Spring Boot 3.0.5 ⚡
+* Spring Web
+* Spring Security 🔐
+* Spring Data JPA
+* Spring Cloud
+* Redis 🧑‍🔧
+* MongoDB 🗄️
+* PostgreSQL 🐘
 
-## Overview
+## 🔧 Ferramentas Adicionais
+* Apache Kafka 📡 (mensageria em tempo real)
+* Armazenamento AWS S3 ☁️ (armazenamento de mídia)
+* OpenFeign (chamadas entre microsserviços simplificadas)
+* Discovery Server (Eureka) 🔍
+* Spring API Gateway 🌐 (roteamento centralizado)
+* Rastreamento Distribuído com Zipkin 🕵️
+* Spring Cloud Config Server ⚙️ (gerenciamento de configurações)
+* MapStruct (mapeamento de objetos)
+* Swagger 📄 (documentação de APIs)
+* Testcontainers (testes integrados com containers Docker)
+* Mockito (testes unitários)
+* 💼 Serviços Principais
+* 🔑 Serviço de Autenticação
 
-> This application is built using a microservices architecture with the Spring framework, allowing for modular and
-> independent development of specific functionalities. This approach enables scalability and maintainability of the
-> application.
+Responsável pelo registro de usuários, autenticação e geração de tokens JWT que expiram em 24 horas. O usuário pode se autenticar usando e-mail e senha, e após a ativação da conta, recebe o token JWT.
 
-## Architecture Diagram
+## 💾 Serviço de Armazenamento
+Este serviço gerencia o armazenamento de arquivos multimídia no AWS S3, permitindo o upload e download de imagens, vídeos e outros arquivos.
 
-![](images/architecture-diagram.png)
+## 👤 Serviço de Perfil
+Permite que os usuários personalizem seus perfis, façam upload de avatares e banners. O serviço usa caching para melhorar o desempenho, evitando consultas repetidas ao banco de dados.
 
-## Technology stack
+##  💬 Serviço de Tweets
+Gerencia a criação, atualização e exclusão de tweets, bem como funcionalidades de curtir, retweetar e responder. Também existe um sistema de visualizações para cada tweet e um cache para otimizar a experiência.
 
-- Java 17
+## ⏳ Serviço de Timeline
+Oferece uma timeline personalizada para cada usuário, com base nos tweets dos perfis que ele segue. Utiliza cache para melhorar a velocidade e a eficiência no carregamento da timeline.
 
-- Spring Boot 3.0.5
-- Spring Web
-- Spring Security
-- Spring Data Jpa
-- Spring Cloud
+# 💡 Serviços Auxiliares
 
-- Redis
-- MongoDB
-- PostgreSQL
+## 📡 Serviço de Fanout
+Este serviço escuta mensagens da fila de mensagens e distribui dados para o cache dos usuários relevantes.
 
-## Additional tools
+## 🌐 API Gateway
+Roteia todas as requisições entre os microsserviços, garantindo uma comunicação segura usando tokens JWT.
 
-- Apache Kafka
-- AWS blob storage
-- OpenFeign
-- Discovery Server
-- Spring Api Gateway
-- Distributed tracing with Zipkin
-- Spring cloud config server
-- Mapstruct
-- Swagger docs
-- Testcontainers
-- Mockito
+## 🔍 Discovery Server e Load Balancer
+Facilita a descoberta e comunicação entre os microsserviços, além de balancear a carga para otimizar o desempenho.
 
-## Main Services
+## ⚙️ Cloud Config Server
+Centraliza e gerencia as configurações de todos os microsserviços em diferentes ambientes de produção, homologação e desenvolvimento.
 
-* [Authentication service](#authentication-service)
-* [Storage service](#storage-service)
-* [Profile service](#profile-service)
-* [Tweet service](#tweet-service)
-* [Timeline service](#timeline-service)
+## 🎯 Contribuições
+Contribuições são bem-vindas! Se você encontrar algum bug ou quiser adicionar novas funcionalidades, sinta-se à vontade para abrir um Pull Request ou criar uma Issue.
 
-### Authentication service
+Como Contribuir:
+* Faça um fork deste repositório.
+* Crie uma branch para sua funcionalidade: git checkout -b 
+* feature/nova-funcionalidade.
+* Faça suas alterações e adicione commits.
+* Envie um Pull Request.
 
-Handles user registration, authorization, and generation of JWT tokens for secure login that expires after 24 hours.
-Once the user activates their account by entering the code, they can log in using their email and password and receive a
-personal JWT token that expires after 24 hours.
+## 📞 Contato
+Caso tenha dúvidas ou sugestões, entre em contato:
 
-### Storage service
-
-Connects to Amazon blob storage, enabling users to store and retrieve media files.
-
-### Profile service
-
-Allows users to view and follow other users, update their profiles, and upload custom avatars and banners. The service
-utilizes caching to store user profiles for improved performance.
-
-### Tweet service
-
-Allows users to create/update/delete tweets, as well as retweet/like/reply on them. Also, there is views
-system, so when user gets any tweet, views counter is incremented by 1, and cache system that will cache tweets.
-When user creates new tweet, it will be added to user's user timeline and home timelines of his followers in cache, 
-however if user has a lot of followers, it will be added only to user timeline to reduce time and improve performance.
-
-### Timeline service
-
-Provides any type of timeline for user. When user gets his user timeline, then it will
-be received from cache, but if it's absent there, it will be requested from tweet service which will obtain it from
-database and give it back sorted by reversed chronological order. When user gets his home timeline, service tries to 
-obtain it from cache, but if there was nothing, then it will take user timeline of every followee of that user, sort 
-resulted list and cache it for further usage. As is known celebrities don't push created tweets to home timelines of followers,
-so that service take user timeline of every followee celebrity and add those tweets to the response as well as sort it by
-reversed chronological order.
-
-## Auxiliary services
-
-* [Fanout Service](fanout-service)
-* [Api Gateway](#api-gateway)
-* [Discovery server](#discovery-server-and-loadbalancer)
-* [Cloud config server](#cloud-config-server)
-
-### Fanout service
-This service receives messages with entities from the message queue and store them in cache for particular user.
-
-### Api Gateway
-
-Acts as a centralized access point for the application, ensuring secure interaction with the services using JWT tokens.
-
-### Discovery server and LoadBalancer
-
-Facilitates microservice communication by enabling service discovery and load balancing.
-
-### Cloud config server
-
-Provides configuration properties for all services in the application.
-
-## Tests coverage
-
-![](images/all-services-coverage.png)
-
-## How to run application locally
-
-1. Install docker desktop and configure it.
-2. Download docker-compose.yml
-3. Open file location in terminal and enter ```docker-compose up```
-4. Wait until all images are pulled and containers are created
-5. Open postman and send requests!
-
-> If you need documentation for endpoints, hit http://localhost:8080/swagger-ui.html
-
-> You have to create tweet or update profile this way:
-![](images/how-to-create-tweet.png)
+Email: ikauedeveloper@gmail.com 
+LinkedIn: https://www.linkedin.com/in/ikauematos/
