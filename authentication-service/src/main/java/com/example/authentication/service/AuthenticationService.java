@@ -20,9 +20,9 @@ import com.example.authentication.entity.Account;
 import com.example.authentication.entity.ActivationCode;
 import com.example.authentication.exception.AccountNotActivatedException;
 import com.example.authentication.exception.InvalidCredentialsException;
+import com.example.authentication.exception.UserAlreadyExistsException;
 import com.example.authentication.repository.AccountRepository;
 
-import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,20 +42,20 @@ public class AuthenticationService {
 
     public ActivationCodeResponse register(RegisterRequest request) {
         if (accountService.isAccountExists(request.email())) {
-            throw new EntityExistsException(
+            throw new UserAlreadyExistsException(
                     messageService.generateMessage("error.account.already_exists", request.email())
             );
         }
 
         Account newAccount = accountService.createAccount(request.email(), request.password(), false);
-        log.info("Account {} has been created", newAccount.getId());
+        log.info("Conta {} foi criada", newAccount.getId());
 
         CreateProfileRequest createProfileRequest = new CreateProfileRequest(request.username(), request.email(), LocalDate.now());
         String profileId = profileServiceClient.createProfile(createProfileRequest);
-        log.info("Profile {} has been created", profileId);
+        log.info("Perfil {} foi criado", profileId);
 
         activationCodeService.sendNewActivationCode(newAccount);
-        log.info("Activation code has been sent to {}", newAccount.getEmail());
+        log.info("Código de ativação enviado para {}", newAccount.getEmail());
 
         return ActivationCodeResponse.builder()
                 .message(messageService.generateMessage("activation.send.success"))
@@ -65,7 +65,7 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         Optional<Account> optionalAccount = accountRepository.findByEmail(request.email());
         if (optionalAccount.isEmpty()) {
-            log.error("Authentication failed: account with email {} not found", request.email());
+            log.error("Falha na autenticação: conta com email {} não encontrada", request.email());
             throw new InvalidCredentialsException(
                     messageService.generateMessage("error.account.credentials_invalid")
             );
@@ -73,14 +73,14 @@ public class AuthenticationService {
     
         Account account = optionalAccount.get();
         if (!account.isEnabled()) {
-            log.error("Authentication failed: account with email {} is not activated", account.getEmail());
+            log.error("Falha na autenticação: conta com email {} não está ativada", account.getEmail());
             throw new AccountNotActivatedException(
                     messageService.generateMessage("error.account.not_activated", account.getEmail())
             );
         }
     
         if (!passwordEncoder.matches(request.password(), account.getPassword())) {
-            log.error("Authentication failed: invalid password for account {}", request.email());
+            log.error("Falha na autenticação: senha inválida para a conta {}", request.email());
             throw new InvalidCredentialsException(
                     messageService.generateMessage("error.account.credentials_invalid")
             );
@@ -94,19 +94,19 @@ public class AuthenticationService {
                     )
             );
         } catch (BadCredentialsException e) {
-            log.error("Authentication failed: invalid credentials for account {}", request.email());
+            log.error("Falha na autenticação: credenciais inválidas para a conta {}", request.email());
             throw new InvalidCredentialsException(
                     messageService.generateMessage("error.account.credentials_invalid")
             );
         } catch (DisabledException e) {
-            log.error("Authentication failed: account with email {} is disabled", request.email());
+            log.error("Falha na autenticação: conta com email {} está desativada", request.email());
             throw new AccountNotActivatedException(
                     messageService.generateMessage("error.account.not_activated", request.email())
             );
         }
     
         String jwt = jwtService.generateJwt(account);
-        log.info("JWT successfully generated for account {}", account.getEmail());
+        log.info("JWT gerado com sucesso para a conta {}", account.getEmail());
         tokenService.deleteTokenByAccount(account);
         tokenService.createToken(account, jwt);
         
@@ -121,7 +121,7 @@ public class AuthenticationService {
         accountService.enableAccount(activationCode.getAccount());
         activationCodeService.deleteActivationCodeById(activationCode.getId());
 
-        log.info("Account with email {} has been successfully activated", activationCode.getAccount().getEmail());
+        log.info("Conta com email {} foi ativada com sucesso", activationCode.getAccount().getEmail());
         return ActivationCodeResponse.builder()
                 .message(messageService.generateMessage("account.activation.success"))
                 .build();

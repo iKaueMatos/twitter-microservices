@@ -23,12 +23,14 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<ActivationCodeResponse> register(@Valid @RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authenticationService.register(request));
+        ActivationCodeResponse response = authenticationService.register(request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(@Valid @RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(authenticationService.authenticate(request));
+        AuthenticationResponse response = authenticationService.authenticate(request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/activate")
@@ -36,11 +38,13 @@ public class AuthenticationController {
             @RequestParam @Pattern(regexp = "^\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}$", message = "{activation.invalid}")
             String activationCode
     ) {
-        return ResponseEntity.ok(authenticationService.activate(activationCode));
+        ActivationCodeResponse response = authenticationService.activate(activationCode);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/validate/{jwt}")
     public ResponseEntity<String> isTokenValid(@PathVariable String jwt) {
-        return ResponseEntity.ok(tokenService.isTokenValid(jwt));
+        String response = tokenService.isTokenValid(jwt);
+        return ResponseEntity.ok(response);
     }
 }

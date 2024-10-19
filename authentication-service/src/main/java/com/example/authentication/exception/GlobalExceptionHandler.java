@@ -76,4 +76,28 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(error, status);
     }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleUserAlreadyExists(UserAlreadyExistsException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        errorResponse.put("status", HttpStatus.CONFLICT.value()); // 409
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidActivationCodeException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidActivationCode(InvalidActivationCodeException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        errorResponse.put("status", HttpStatus.BAD_REQUEST.value()); // 400
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("error", "An unexpected error occurred: " + ex.getMessage());
+        errorResponse.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
 }
